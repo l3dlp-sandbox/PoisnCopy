@@ -7,6 +7,10 @@ using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.Interactivity;
 using Microsoft.Extensions.Configuration;
+using DSharpPlus.Interactivity.Extensions;
+using DSharpPlus.Interactivity.Enums;
+using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PoisnCopy
 {
@@ -20,8 +24,8 @@ namespace PoisnCopy
 
         /* These are the discord library's main classes */
         private DiscordClient _discord;
-        private CommandsNextModule _commands;
-        private InteractivityModule _interactivity;
+        private CommandsNextExtension _commands;
+        private InteractivityExtension _interactivity;
 
         /* Use the async main to create an instance of the class and await it(async main is only available in C# 7.1 onwards). */
 
@@ -52,17 +56,17 @@ namespace PoisnCopy
                 // Create the interactivity module(I'll show you how to use this later on)
                 _interactivity = _discord.UseInteractivity(new InteractivityConfiguration()
                 {
-                    PaginationBehaviour = TimeoutBehaviour.Delete, // What to do when a pagination request times out
-                    PaginationTimeout = TimeSpan.FromSeconds(30), // How long to wait before timing out
+                    PaginationBehaviour = PaginationBehaviour.WrapAround, // What to do when a pagination request times out
+                    PaginationDeletion = PaginationDeletion.DeleteMessage, // How long to wait before timing out
                     Timeout = TimeSpan.FromSeconds(30) // Default time to wait for interactive commands like waiting for a message or a reaction
                 });
 
                 // Build dependancies and then create the commands module.
-                var deps = BuildDeps();
+                var services = BuildServices();
                 _commands = _discord.UseCommandsNext(new CommandsNextConfiguration
                 {
-                    StringPrefix = _config.GetValue<string>("discord:CommandPrefix"), // Load the command prefix(what comes before the command, eg "!" or "/") from our config file
-                    Dependencies = deps // Pass the dependancies
+                    StringPrefixes = new List<string> { _config.GetValue<string>("discord:CommandPrefix") }, // Load the command prefix(what comes before the command, eg "!" or "/") from our config file
+                    Services = services
                 });
 
                 Console.WriteLine("[info] Loading command modules..");
@@ -108,16 +112,16 @@ namespace PoisnCopy
          We can then access these in our command modules.
         */
 
-        private DependencyCollection BuildDeps()
+        private ServiceProvider BuildServices()
         {
-            using var deps = new DependencyCollectionBuilder();
+            var deps = new ServiceCollection();
 
-            deps.AddInstance(_interactivity) // Add interactivity
-                .AddInstance(_cts) // Add the cancellation token
-                .AddInstance(_config) // Add our config
-                .AddInstance(_discord); // Add the discord client
+            deps.AddSingleton(_interactivity) // Add interactivity
+                .AddSingleton(_cts) // Add the cancellation token
+                .AddSingleton(_config) // Add our config
+                .AddSingleton(_discord); // Add the discord client
 
-            return deps.Build();
+            return deps.BuildServiceProvider();
         }
     }
 }
