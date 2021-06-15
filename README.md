@@ -1,3 +1,4 @@
+## The PoisnCopy Bot is going to be down for awhile. I do not have the funds to maintain the server.
 # PoisnCopy
 Discord channel copy bot
 
