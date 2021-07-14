@@ -1,4 +1,4 @@
-## The PoisnCopy Bot is going to be down for awhile. I do not have the funds to maintain the server.
+<a href="https://www.buymeacoffee.com/poisncopy" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 # PoisnCopy
 Discord channel copy bot
 
