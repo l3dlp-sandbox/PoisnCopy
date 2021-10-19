@@ -1,3 +1,8 @@
+# ALERT
+PoisnCopy is now on 100 servers which is the capacity based on [this post from Discord](https://support.discord.com/hc/en-us/articles/4410940809111). I do not have any plans to Verify my bot. this decision is not an easy one as I know this bot is very useful to many people as Discord does not offer this service themselves. I frankly do not have time to spend getting this bot into compliance. Should demand change for this, I might reconsider.
+
+Therefore, _if you try to add the bot to your servers it won't work._ Feel free to contact me directly with question: posinfang@poisnfang.com
+### Show Some Support
 <a href="https://www.buymeacoffee.com/poisncopy" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 # PoisnCopy
 Discord channel copy bot
