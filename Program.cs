@@ -47,38 +47,51 @@ namespace PoisnCopy
 
                 // Create the DSharpPlus client
                 Console.WriteLine("[info] Creating discord client..");
-                _discord = new DiscordClient(new DiscordConfiguration
-                {
-                    Token = _config.GetValue<string>("discord:token"),
-                    TokenType = TokenType.Bot
-                });
+                _discord = new DiscordClient(
+                    new DiscordConfiguration
+                    {
+                        Token = _config.GetValue<string>("discord:token"),
+                        TokenType = TokenType.Bot
+                    }
+                );
 
                 // Create the interactivity module(I'll show you how to use this later on)
-                _interactivity = _discord.UseInteractivity(new InteractivityConfiguration()
-                {
-                    PaginationBehaviour = PaginationBehaviour.WrapAround, // What to do when a pagination request times out
-                    PaginationDeletion = PaginationDeletion.DeleteMessage, // How long to wait before timing out
-                    Timeout = TimeSpan.FromSeconds(30) // Default time to wait for interactive commands like waiting for a message or a reaction
-                });
+                _interactivity = _discord.UseInteractivity(
+                    new InteractivityConfiguration()
+                    {
+                        PaginationBehaviour = PaginationBehaviour.WrapAround, // What to do when a pagination request times out
+                        PaginationDeletion = PaginationDeletion.DeleteMessage, // How long to wait before timing out
+                        Timeout = TimeSpan.FromSeconds(30) // Default time to wait for interactive commands like waiting for a message or a reaction
+                    }
+                );
 
                 // Build dependancies and then create the commands module.
                 var services = BuildServices();
-                _commands = _discord.UseCommandsNext(new CommandsNextConfiguration
-                {
-                    StringPrefixes = new List<string> { _config.GetValue<string>("discord:CommandPrefix") }, // Load the command prefix(what comes before the command, eg "!" or "/") from our config file
-                    Services = services
-                });
+                _commands = _discord.UseCommandsNext(
+                    new CommandsNextConfiguration
+                    {
+                        StringPrefixes = new List<string>
+                        {
+                            _config.GetValue<string>("discord:CommandPrefix")
+                        }, // Load the command prefix(what comes before the command, eg "!" or "/") from our config file
+                        Services = services,
+                        EnableDms = false
+                    }
+                );
 
                 Console.WriteLine("[info] Loading command modules..");
 
                 var type = typeof(IModule); // Get the type of our interface
-                var types = AppDomain.CurrentDomain.GetAssemblies() // Get the assemblies associated with our project
+                var types = AppDomain.CurrentDomain
+                    .GetAssemblies() // Get the assemblies associated with our project
                     .SelectMany(s => s.GetTypes()) // Get all the types
                     .Where(p => type.IsAssignableFrom(p) && !p.IsInterface); // Filter to find any type that can be assigned to an IModule
 
                 var typeList = types as Type[] ?? types.ToArray(); // Convert to an array
                 foreach (var t in typeList)
-                    _commands.RegisterCommands(t); // Loop through the list and register each command module with CommandsNext
+                {
+                    _commands.RegisterCommands(t);
+                }
 
                 Console.WriteLine($"[info] Loaded {typeList.Count()} modules.");
                 await RunAsync(args);
