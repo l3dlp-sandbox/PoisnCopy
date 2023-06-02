@@ -21,7 +21,7 @@ public class BasicCommandsModule : BaseCommandModule, IModule
         await ctx.TriggerTypingAsync();
 
         var connections = ctx.Client.Guilds;
-        await ctx.RespondAsync($"I am running on {connections} servers");
+        await ctx.RespondAsync($"I am running on {connections.ToList().Count} servers");
     }
 
     [Command("alive")]

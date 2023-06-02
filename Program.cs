@@ -51,7 +51,8 @@ namespace PoisnCopy
                     new DiscordConfiguration
                     {
                         Token = _config.GetValue<string>("discord:token"),
-                        TokenType = TokenType.Bot
+                        TokenType = TokenType.Bot,
+                        Intents = DiscordIntents.AllUnprivileged | DiscordIntents.MessageContents
                     }
                 );
 
@@ -112,7 +113,7 @@ namespace PoisnCopy
             Console.WriteLine("Connecting..");
             await _discord.ConnectAsync();
             Console.WriteLine("Connected!");
-            var connections = _discord.Presences.Count;
+            var connections = _discord.Guilds.Count;
             Console.WriteLine($"I am running on {connections} servers");
 
             // Keep the bot running until the cancellation token requests we stop

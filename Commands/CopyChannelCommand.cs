@@ -42,14 +42,14 @@ public class CopyChannelCommand : BaseCommandModule, IModule
         foreach (var txtChan in textChannels)
         {
             messages.Add($"`{txtChan.Value.Id}-{txtChan.Value.Name}`");
-            var dismsg = await ctx.Channel.SendMessageAsync(
-                $"`{txtChan.Value.Id}-{txtChan.Value.Name}`"
-            );
-            await dismsg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":arrow_up_small:"));
+            //var dismsg = await ctx.Channel.SendMessageAsync(
+            //   $"`{txtChan.Value.Id}-{txtChan.Value.Name}`"
+            //   );
+            //await dismsg.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":arrow_up_small:"));
         }
 
         messages.Add("Thats all of the channels!");
-        //var msg = await ctx.RespondAsync(string.Join("\n", messages));
+        var msg = await ctx.RespondAsync(string.Join("\n", messages));
 
         //wait for reaction from user
 
@@ -103,39 +103,40 @@ public class CopyChannelCommand : BaseCommandModule, IModule
 
         if (string.IsNullOrEmpty(response.Result.Content))
         {
-            await ctx.RespondAsync("Name cannot be empty!");
+            await ctx.Channel.SendMessageAsync("Name cannot be empty!");
             return;
         }
 
         var channelName = response.Result.Content;
 
-        await ctx.RespondAsync("Starting copy...");
+        await ctx.Channel.SendMessageAsync("Starting copy...");
 
-        await ctx.RespondAsync("Collecting messages...");
+        await ctx.Channel.SendMessageAsync("Collecting messages...");
 
         var messag = await selectedChannel.GetMessagesAsync();
 
         var messCopy = messag.ToList();
-
         var more = await selectedChannel.GetMessagesAsync(100);
 
         while (more.Count > 0)
         {
             messCopy.AddRange(more);
-            more = await selectedChannel.GetMessagesAsync(100);
+            more = await selectedChannel.GetMessagesBeforeAsync(more.LastOrDefault().Id, 100);
         }
 
-        await ctx.RespondAsync("Organizing messages...");
+        await ctx.Channel.SendMessageAsync("Organizing messages...");
 
         messCopy.Reverse();
 
         var newMess = new List<DiscordMessage>();
 
-        await ctx.RespondAsync("Creating channel...");
+        await ctx.Channel.SendMessageAsync("Creating channel...");
 
         var newChan = await ctx.Guild.CreateChannelAsync(channelName, selectedChannel.Type);
 
-        await ctx.RespondAsync($"Posting {messCopy.Count} messages... (this could take awhile)");
+        await ctx.Channel.SendMessageAsync(
+            $"Posting {messCopy.Count} messages... (this could take awhile)"
+        );
 
         foreach (var mes in messCopy)
         {
@@ -154,6 +155,7 @@ public class CopyChannelCommand : BaseCommandModule, IModule
                 };
 
                 await newChan.SendMessageAsync(what);
+                await Task.Delay(800);
             }
 
             if (mes.Attachments.Count > 0)
@@ -173,6 +175,7 @@ public class CopyChannelCommand : BaseCommandModule, IModule
                     };
 
                     await newChan.SendMessageAsync(what);
+                    await Task.Delay(800);
                 }
             }
         }
